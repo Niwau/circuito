@@ -6,7 +6,7 @@ import {
   Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { HttpNode } from "../shared/ui/nodes/http";
+import { HttpNode } from "../entities/http/ui/http-node";
 import { Play } from "lucide-react";
 import { Button } from "../shared/ui/button";
 import { FlowStore, useFlowStore } from "../shared/store";
@@ -20,22 +20,6 @@ import {
   ContextMenuLabel,
   ContextMenuSeparator,
 } from "@/shared/ui/context-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shared/ui/dialog";
-import { Input } from "@/shared/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/ui/select";
 import { HttpDialog } from "@/entities/http/ui/http-dialog";
 
 const nodeTypes: NodeTypes = {
@@ -49,41 +33,32 @@ const selector = (state: FlowStore) => ({
   onEdgesChange: state.onEdgesChange,
   onConnect: state.onConnect,
   setNodes: state.setNodes,
+  setFutureNodePosition: state.setFutureNodePosition,
+  runFlow: state.runFlow,
 });
 
-// const addNode = useCallback(
-//   (e: MouseEvent) => {
-//     const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-//
-//     const node: HttpNodeType = {
-//       type: "http",
-//       id: (nodes.length + 1).toString(),
-//       data: {
-//         method: "DELETE",
-//         url: "https://example.com",
-//         status: "success",
-//       },
-//       position: {
-//         x: position.x - 100,
-//         y: position.y - 25,
-//       },
-//     };
-//
-//     setNodes([...nodes, node]);
-//   },
-//   [nodes, screenToFlowPosition],
-// );
-
 export const FlowEditor = () => {
+  const {
+    nodes,
+    edges,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    setFutureNodePosition,
+    runFlow,
+  } = useFlowStore(useShallow(selector));
+
   const { screenToFlowPosition } = useReactFlow();
-  const { setNodes, nodes, edges, onNodesChange, onEdgesChange, onConnect } =
-    useFlowStore(useShallow(selector));
 
   const dialog = useToggle();
 
+  const onContextMenu = (e: React.MouseEvent) => {
+    setFutureNodePosition(screenToFlowPosition({ x: e.clientX, y: e.clientY }));
+  };
+
   return (
     <ContextMenu>
-      <ContextMenuTrigger>
+      <ContextMenuTrigger onContextMenu={onContextMenu}>
         <div style={{ width: "100vw", height: "100vh" }}>
           <ReactFlow
             nodes={nodes}
@@ -96,7 +71,7 @@ export const FlowEditor = () => {
           >
             <Background />
             <Panel>
-              <Button>
+              <Button onClick={runFlow}>
                 <Play />
                 Run Flow
               </Button>

@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@/shared/ui/dialog";
 import { Input } from "@/shared/ui/input";
-import { HttpMethod, HttpNodeType } from "@/shared/ui/nodes/http";
+import { HttpMethod, HttpNodeType } from "./http-node";
 import {
   Select,
   SelectTrigger,
@@ -17,8 +17,6 @@ import {
   SelectContent,
   SelectItem,
 } from "@/shared/ui/select";
-import { useReactFlow } from "@xyflow/react";
-import { useCallback } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 
@@ -39,8 +37,8 @@ export const HttpDialog = ({
   onOpenChange,
   onClose,
 }: HttpDialogProps) => {
-  const { screenToFlowPosition } = useReactFlow();
   const addNode = useFlowStore((store) => store.addNode);
+  const futureNodePosition = useFlowStore((store) => store.futureNodePosition);
 
   const form = useForm<HttpFormValues>({
     defaultValues: {
@@ -50,25 +48,26 @@ export const HttpDialog = ({
     },
   });
 
-  // const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-
   const onSubmit = form.handleSubmit((data) => {
+    if (!futureNodePosition) {
+      console.error("Future node position is not set.");
+      return;
+    }
+
     const node: HttpNodeType = {
       type: "http",
       id: uuidv4(),
       data: {
         method: data.method,
         url: data.url,
-        status: "idle",
       },
-      // TODO: get actual position
-      position: {
-        x: 0,
-        y: 0,
-      },
+      position: futureNodePosition,
     };
     addNode(node);
     onClose();
+    setTimeout(() => {
+      form.reset();
+    }, 300);
   });
 
   return (
