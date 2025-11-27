@@ -20,7 +20,7 @@ import {
   ContextMenuLabel,
   ContextMenuSeparator,
 } from "@/shared/ui/context-menu";
-import { HttpDialog } from "@/entities/http/ui/http-dialog";
+import { HttpDialog } from "@/entities/http/ui/create-dialog";
 
 const nodeTypes: NodeTypes = {
   http: HttpNode,
