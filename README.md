@@ -1,5 +1,7 @@
 # ⚡ Circuito
 
+<img src="./public/screenshot.png" alt="Circuito Logo" width="100%"/>
+
 > The ultimate node-based API testing client. Built for performance, designed for complex flows.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
