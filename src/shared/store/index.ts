@@ -18,7 +18,6 @@ export interface FlowState {
   nodes: Node[];
   edges: Edge[];
   futureNodePosition?: XYPosition;
-  runningNodeId?: string;
   isRunning: boolean;
 }
 
@@ -29,10 +28,11 @@ export interface FlowActions {
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
   addNode: (node: Node) => void;
+  setNode: (nodeId: string, data: HttpNodeProps) => void;
   setFutureNodePosition: (position: XYPosition) => void;
   runFlow: () => Promise<void>;
-  setRunningNodeId: (nodeId: string | undefined) => void;
-  setNode: (nodeId: string, data: HttpNodeProps) => void;
+  runNode: (nodeId: string) => Promise<void>;
+  getNode: (nodeId: string) => Node<HttpNodeProps> | undefined;
 }
 
 export type FlowStore = FlowState & FlowActions;
@@ -41,6 +41,11 @@ export const useFlowStore = create<FlowStore>((set, get) => ({
   nodes: [],
   edges: [],
   isRunning: false,
+  getNode: (nodeId: string) => {
+    return get().nodes.find((n) => n.id === nodeId) as
+      | Node<HttpNodeProps>
+      | undefined;
+  },
   onNodesChange: (changes) => {
     set({
       nodes: applyNodeChanges(changes, get().nodes),
@@ -68,9 +73,6 @@ export const useFlowStore = create<FlowStore>((set, get) => ({
   setFutureNodePosition: (position) => {
     set({ futureNodePosition: position });
   },
-  setRunningNodeId: (nodeId) => {
-    set({ runningNodeId: nodeId });
-  },
   setNode: (nodeId, data) => {
     const nodes = get().nodes.map((node) => {
       if (node.id === nodeId) {
@@ -86,10 +88,49 @@ export const useFlowStore = create<FlowStore>((set, get) => ({
     });
     set({ nodes });
   },
+  runNode: async (id: string) => {
+    const setNode = get().setNode;
+    const getNode = get().getNode;
+    let start = Date.now();
+
+    const currentNode = getNode(id);
+
+    if (!currentNode) {
+      console.error(`Tried to run a node that does not exist ${id}`);
+      return;
+    }
+
+    setNode(id, {
+      status: "running",
+    });
+
+    let data = currentNode.data;
+
+    try {
+      let response = await invoke<HttpResponse>("http_request", {
+        request: {
+          url: currentNode.data.url,
+          method: currentNode.data.method,
+        },
+      });
+      data.status = "success";
+      data.info = response.status.toString();
+    } catch (e) {
+      console.error(`Error on node $id}`, e);
+      let error = e as HttpResponse;
+      data.status = "error";
+      data.info = error.status.toString();
+    } finally {
+      let end = Date.now();
+      const ms = end - start;
+      data.info += ` - ${ms}ms`;
+      setNode(id, data);
+    }
+  },
   runFlow: async () => {
     const nodes = get().nodes;
     const edges = get().edges;
-    const setNode = get().setNode;
+    const runNode = get().runNode;
 
     const adjacencyList = new Map<string, string[]>();
     const inDegree = new Map<string, number>();
@@ -116,26 +157,7 @@ export const useFlowStore = create<FlowStore>((set, get) => ({
       const currentNode = nodes.find((n) => n.id === currentNodeId);
       if (!currentNode) continue;
 
-      set({ runningNodeId: currentNodeId });
-      setNode(currentNodeId, { status: "running" });
-
-      try {
-        let response = await invoke<HttpResponse>("http_request", {
-          request: {
-            url: currentNode.data?.url,
-            method: currentNode.data?.method,
-            headers: currentNode.data?.headers,
-            body: currentNode.data?.body,
-          },
-        });
-        setNode(currentNodeId, { status: "success", code: response.status });
-      } catch (e) {
-        console.error(`Error on node ${currentNodeId}`, e);
-        let error = e as HttpResponse;
-        set({ runningNodeId: undefined });
-        setNode(currentNodeId, { status: "error", code: error.status });
-        return;
-      }
+      await runNode(currentNodeId);
 
       const neighbors = adjacencyList.get(currentNodeId) || [];
 
@@ -147,7 +169,5 @@ export const useFlowStore = create<FlowStore>((set, get) => ({
         }
       }
     }
-
-    set({ runningNodeId: undefined });
   },
 }));

@@ -27,7 +27,6 @@ export const Default: Story = {
   args: {
     data: {
       status: "idle",
-      code: 200,
       method: "GET",
       url: "https://api.example.com/api/v1",
     },
@@ -38,8 +37,8 @@ export const Running: Story = {
   args: {
     data: {
       status: "running",
-      code: 200,
-      method: "GET",
+      info: "200 OK - 150ms",
+      method: "POST",
       url: "https://api.example.com/api/v1",
     },
   },
@@ -49,8 +48,8 @@ export const Success: Story = {
   args: {
     data: {
       status: "success",
-      code: 200,
-      method: "GET",
+      info: "200 OK - 150ms",
+      method: "PUT",
       url: "https://api.example.com/api/v1",
     },
   },
@@ -60,10 +59,9 @@ export const Error: Story = {
   args: {
     data: {
       status: "error",
-      code: 404,
-      method: "GET",
+      info: "404 Not Found - 150ms",
+      method: "DELETE",
       url: "https://api.example.com/api/v1",
     },
   },
 };
-

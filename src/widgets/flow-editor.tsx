@@ -6,7 +6,7 @@ import {
   Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { HttpNode } from "../entities/http/ui/http-node";
+import { HttpNode, HttpNodeType } from "../entities/http/ui/http-node";
 import { Play } from "lucide-react";
 import { Button } from "../shared/ui/button";
 import { FlowStore, useFlowStore } from "../shared/store";
@@ -20,7 +20,8 @@ import {
   ContextMenuLabel,
   ContextMenuSeparator,
 } from "@/shared/ui/context-menu";
-import { HttpDialog } from "@/entities/http/ui/create-dialog";
+import { v4 as uuid } from "uuid";
+import { useCallback } from "react";
 
 const nodeTypes: NodeTypes = {
   http: HttpNode,
@@ -33,8 +34,10 @@ const selector = (state: FlowStore) => ({
   onEdgesChange: state.onEdgesChange,
   onConnect: state.onConnect,
   setNodes: state.setNodes,
-  setFutureNodePosition: state.setFutureNodePosition,
+  addNode: state.addNode,
   runFlow: state.runFlow,
+  setFutureNodePosition: state.setFutureNodePosition,
+  futureNodePosition: state.futureNodePosition,
 });
 
 export const FlowEditor = () => {
@@ -44,17 +47,33 @@ export const FlowEditor = () => {
     onNodesChange,
     onEdgesChange,
     onConnect,
-    setFutureNodePosition,
     runFlow,
+    addNode,
+    setFutureNodePosition,
+    futureNodePosition,
   } = useFlowStore(useShallow(selector));
 
   const { screenToFlowPosition } = useReactFlow();
 
   const dialog = useToggle();
 
-  const onContextMenu = (e: React.MouseEvent) => {
+  const onContextMenu = useCallback((e: React.MouseEvent) => {
     setFutureNodePosition(screenToFlowPosition({ x: e.clientX, y: e.clientY }));
-  };
+  }, []);
+
+  const addHttpNode = useCallback(() => {
+    dialog.toggle();
+    const newNode: HttpNodeType = {
+      id: uuid(),
+      type: "http",
+      position: futureNodePosition || { x: 0, y: 0 },
+      data: {
+        url: "https://example.com/api/v1",
+        method: "GET",
+      },
+    };
+    addNode(newNode);
+  }, [futureNodePosition]);
 
   return (
     <ContextMenu>
@@ -80,16 +99,10 @@ export const FlowEditor = () => {
         </div>
       </ContextMenuTrigger>
 
-      <HttpDialog
-        onClose={dialog.toggle}
-        onOpenChange={dialog.toggle}
-        isOpen={dialog.isOpen}
-      />
-
       <ContextMenuContent className="w-64">
         <ContextMenuLabel>Add Node</ContextMenuLabel>
         <ContextMenuSeparator />
-        <ContextMenuItem inset onClick={dialog.toggle}>
+        <ContextMenuItem inset onClick={addHttpNode}>
           HTTP Request
         </ContextMenuItem>
         <ContextMenuItem inset>gRPC Call</ContextMenuItem>
