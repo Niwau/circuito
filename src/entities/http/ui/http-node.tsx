@@ -12,6 +12,7 @@ import {
 } from "@/shared/ui/select";
 import { Separator } from "@/shared/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Textarea } from "@/shared/ui/textarea";
 import { Handle, Node, NodeProps, Position } from "@xyflow/react";
 import { Play } from "lucide-react";
 import { ChangeEvent, useCallback } from "react";
@@ -20,10 +21,10 @@ export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 export type NodeStatus = "idle" | "running" | "success" | "error";
 
 export type HttpNodeProps = {
-  url?: string;
+  url: string;
   className?: string;
   info?: string;
-  method?: HttpMethod;
+  method: HttpMethod;
   status?: NodeStatus;
 };
 
@@ -32,17 +33,17 @@ export type HttpNodeType = Node<HttpNodeProps>;
 const getMethodColor = (method: string) => {
   switch (method) {
     case "GET":
-      return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+      return "!bg-blue-500/20 text-blue-400 border-blue-500/30";
     case "POST":
-      return "bg-yellow-100/20 text-yellow-400 border-yellow-500/30";
+      return "!bg-yellow-100/20 text-yellow-400 border-yellow-500/30";
     case "DELETE":
-      return "bg-red-500/20 text-red-400 border-red-500/30";
+      return "!bg-red-500/20 text-red-400 border-red-500/30";
     case "PUT":
-      return "bg-purple-500/20 text-purple-400 border-purple-500/30";
+      return "!bg-purple-500/20 text-purple-400 border-purple-500/30";
     case "PATCH":
-      return "bg-cyan-200/20 text-cyan-400 border-cyan-500/30";
+      return "!bg-cyan-200/20 text-cyan-400 border-cyan-500/30";
     default:
-      return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+      return "!bg-gray-500/20 text-gray-400 border-gray-500/30";
   }
 };
 
@@ -104,8 +105,8 @@ export const HttpNode = ({
           <Select value={method} onValueChange={setMethod}>
             <SelectTrigger
               className={cn(
-                "w-24 h-8 text-xs font-semibold border px-2",
                 getMethodColor(method),
+                "text-xs font-semibold border",
               )}
             >
               <SelectValue />
@@ -123,68 +124,40 @@ export const HttpNode = ({
         <Handle type="source" position={Position.Right} />
       </CardHeader>
 
+      <Separator />
+
       <CardContent>
-        <div className="p-3">
-          <Tabs defaultValue="params" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 h-8 bg-muted p-1 mb-3">
-              <TabsTrigger value="params" className="text-xs h-6">
-                Params
-              </TabsTrigger>
-              <TabsTrigger value="headers" className="text-xs h-6">
-                Headers
-              </TabsTrigger>
-              <TabsTrigger value="body" className="text-xs h-6">
-                Body
-              </TabsTrigger>
-              <TabsTrigger value="auth" className="text-xs h-6">
-                Auth
-              </TabsTrigger>
-            </TabsList>
+        <Tabs defaultValue="body" className="w-full">
+          <TabsList className="w-full">
+            <TabsTrigger value="body" className="text-xs h-6">
+              Body
+            </TabsTrigger>
+            <TabsTrigger value="headers" className="text-xs h-6">
+              Headers
+            </TabsTrigger>
+          </TabsList>
 
-            {/* Params Tab */}
-            <TabsContent
-              value="params"
-              className="text-xs text-muted-foreground text-center py-4"
-            >
-              Params configuration
-            </TabsContent>
+          <TabsContent value="body">
+            <Textarea className="nodrag" />
+          </TabsContent>
 
-            {/* Headers Tab */}
-            <TabsContent
-              value="headers"
-              className="text-xs text-muted-foreground text-center py-4"
-            >
-              Headers configuration
-            </TabsContent>
-
-            {/* Body Tab */}
-            <TabsContent
-              value="body"
-              className="text-xs text-muted-foreground text-center py-4"
-            >
-              Request body
-            </TabsContent>
-
-            {/* Auth Tab */}
-            <TabsContent
-              value="auth"
-              className="text-xs text-muted-foreground text-center py-4"
-            >
-              Authentication settings
-            </TabsContent>
-          </Tabs>
-        </div>
+          <TabsContent value="headers">
+            <Textarea className="nodrag" />
+          </TabsContent>
+        </Tabs>
       </CardContent>
 
       <Separator />
 
       <CardFooter>
-        <div className="flex items-center gap-2">
-          <div className={cn("w-2 h-2 rounded-full", getDotColor(status))} />
-          <span className="text-xs font-medium text-muted-foreground">
-            {info}
-          </span>
-        </div>
+        {info && (
+          <div className="flex items-center gap-2">
+            <div className={cn("w-2 h-2 rounded-full", getDotColor(status))} />
+            <span className="text-xs font-medium text-muted-foreground">
+              {info}
+            </span>
+          </div>
+        )}
 
         <Button
           onClick={onPlayClick}

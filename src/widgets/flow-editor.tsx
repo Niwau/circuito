@@ -22,6 +22,7 @@ import {
 } from "@/shared/ui/context-menu";
 import { v4 as uuid } from "uuid";
 import { useCallback } from "react";
+import { ThemeToggle } from "@/shared/ui/theme-toggle";
 
 const nodeTypes: NodeTypes = {
   http: HttpNode,
@@ -94,6 +95,9 @@ export const FlowEditor = () => {
                 <Play />
                 Run Flow
               </Button>
+            </Panel>
+            <Panel position="top-right">
+              <ThemeToggle />
             </Panel>
           </ReactFlow>
         </div>

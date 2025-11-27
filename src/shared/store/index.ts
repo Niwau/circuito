@@ -28,7 +28,7 @@ export interface FlowActions {
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
   addNode: (node: Node) => void;
-  setNode: (nodeId: string, data: HttpNodeProps) => void;
+  setNode: (nodeId: string, data: Partial<HttpNodeProps>) => void;
   setFutureNodePosition: (position: XYPosition) => void;
   runFlow: () => Promise<void>;
   runNode: (nodeId: string) => Promise<void>;
