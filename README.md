@@ -48,7 +48,7 @@ We are currently in the **Pre-Alpha** stage.
 - [x] **Project Setup**: Tauri v2 + React + ShadCN initialized.
 - [ ] **HTTP Engine**: Basic GET/POST/PUT/DELETE requests via Rust.
 - [ ] **Visual Interface**: Drag & Drop nodes to build request flows.
-- [ ] **File System**: Save/Load flows from local `.circuito` files.
+- [ ] **File System**: Save/Load flows from local `.json` files.
 - [ ] **gRPC Support**: Dynamic `.proto` file loading and execution.
 - [ ] **Event-Driven**: Kafka Producer/Consumer nodes.
 
@@ -67,7 +67,7 @@ We are currently in the **Pre-Alpha** stage.
 1. **Clone the repository**
 
    ```bash
-   git clone [https://github.com/Niwau/circuito.git](https://github.com/Niwau/circuito.git)
+   git clone [https://github.com/Niwau/circuito.git](https://github.com/your-username/circuito.git)
    cd circuito
    ```
 
