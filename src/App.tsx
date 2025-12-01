@@ -1,8 +1,8 @@
 import { ReactFlowProvider } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
-import { FlowEditor } from "./widgets/flow-editor";
-import "./index.css";
+import { FlowEditor } from "@/widgets/editor/ui";
 import { ThemeProvider } from "./shared/providers/theme-provider";
+import "@xyflow/react/dist/style.css";
+import "./index.css";
 
 export default function App() {
   return (

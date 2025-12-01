@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { HttpNodeProps } from "@/entities/http/ui/http-node";
+import { HttpNodeProps } from "@/entities/http/ui/node";
 import {
   addEdge,
   applyEdgeChanges,
@@ -109,21 +109,25 @@ export const useFlowStore = create<FlowStore>((set, get) => ({
     try {
       let response = await invoke<HttpResponse>("http_request", {
         request: {
-          url: currentNode.data.url,
-          method: currentNode.data.method,
+          url: currentNode.data.request.url,
+          method: currentNode.data.request.method,
+          body: currentNode.data.request.body,
+          headers: currentNode.data.request.headers,
         },
       });
+      data.response = response;
       data.status = "success";
-      data.info = response.status.toString();
     } catch (e) {
       console.error(`Error on node $id}`, e);
       let error = e as HttpResponse;
+      data.response = error;
       data.status = "error";
-      data.info = error.status.toString();
     } finally {
       let end = Date.now();
       const ms = end - start;
-      data.info += ` - ${ms}ms`;
+      if (data.response) {
+        data.response.millis = ms;
+      }
       setNode(id, data);
     }
   },

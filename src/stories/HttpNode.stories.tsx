@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { HttpNode, HttpNodeType } from "./http-node";
+import { HttpNode, HttpNodeType } from "@/entities/http/ui/node";
 import "@/index.css";
 import { ReactFlowProvider } from "@xyflow/react";
 
@@ -27,8 +27,10 @@ export const Default: Story = {
   args: {
     data: {
       status: "idle",
-      method: "GET",
-      url: "https://api.example.com/api/v1",
+      request: {
+        method: "GET",
+        url: "https://api.example.com/api/v1",
+      },
     },
   },
 };
@@ -37,9 +39,14 @@ export const Running: Story = {
   args: {
     data: {
       status: "running",
-      info: "200 OK - 150ms",
-      method: "POST",
-      url: "https://api.example.com/api/v1",
+      request: {
+        method: "POST",
+        url: "https://api.example.com/api/v1",
+      },
+      response: {
+        status: 200,
+        millis: 150,
+      },
     },
   },
 };
@@ -48,9 +55,14 @@ export const Success: Story = {
   args: {
     data: {
       status: "success",
-      info: "200 OK - 150ms",
-      method: "PUT",
-      url: "https://api.example.com/api/v1",
+      request: {
+        method: "PUT",
+        url: "https://api.example.com/api/v1",
+      },
+      response: {
+        status: 200,
+        millis: 150,
+      },
     },
   },
 };
@@ -59,9 +71,14 @@ export const Error: Story = {
   args: {
     data: {
       status: "error",
-      info: "404 Not Found - 150ms",
-      method: "DELETE",
-      url: "https://api.example.com/api/v1",
+      request: {
+        method: "DELETE",
+        url: "https://api.example.com/api/v1",
+      },
+      response: {
+        status: 404,
+        millis: 150,
+      },
     },
   },
 };

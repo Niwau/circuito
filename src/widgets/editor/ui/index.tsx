@@ -6,10 +6,10 @@ import {
   Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { HttpNode, HttpNodeType } from "../entities/http/ui/http-node";
+import { HttpNode, HttpNodeType } from "@/entities/http/ui/node";
 import { Play } from "lucide-react";
-import { Button } from "../shared/ui/button";
-import { FlowStore, useFlowStore } from "../shared/store";
+import { Button } from "@/shared/ui/button";
+import { FlowStore, useFlowStore } from "@/shared/store";
 import { useShallow } from "zustand/shallow";
 import { useToggle } from "@/shared/hooks/use-toggle";
 import {
@@ -69,8 +69,10 @@ export const FlowEditor = () => {
       type: "http",
       position: futureNodePosition || { x: 0, y: 0 },
       data: {
-        url: "https://example.com/api/v1",
-        method: "GET",
+        request: {
+          url: "https://example.com/api/v1",
+          method: "GET",
+        },
       },
     };
     addNode(newNode);
